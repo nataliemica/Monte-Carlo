@@ -35,14 +35,36 @@ Then, if we fix the energetic disorder, we can investigate how the transit time 
 
 ![1D transit time with varied Xvar](1D_Xvar.png)
 
-This has a less-distinct relation to the transit time of a charge through the 1-D site chain. However, we can observe the following:
+From this we can learn the following:
 - Higher electric fields (E) still lead to lower transit times.
-- Large positional disorder leads to larger transit times, but the linear correlation is quite weak - this could make sense, more disorder could lead to higher distances between sites and therefore increase the transit time
+- Large positional disorder leads to larger transit times - sites will be more often far away from each other and therefore take longer to hop to the next site.
 
 ## 2-D transport
 
-A 2 dimensional grid can be initialized with disorder energy and represented by the figure below:
+A 2 dimensional grid can be initialized with inherent site position and energy disorder and represented by the figure below:
 
-![2D grid](2D_grid.png)
+![2D grid](2D_grid_with_boundary.png)
 
-More to come on this project...
+Around my grid I have made a boundary to act as a wall where the charges cannot hop to (or, rather, it is probabalistically nearly zero to do so).
+
+Within my physical model, all generated charges will be far enough away from any other generated charges so that they do not interact with each other. This means that I can initialise my particle by itself along the x=1 axis (x=0 is where the boundary is) and allow it to hop to the end of my grid.
+
+My plan is to initialise a charge along a site on the x=1 line one at a time, have it be pulled across the grid (in the positive x direction) with an external field, then measure how many time steps it took for that transport to happen. This will be done for every site on the x=1 line and repeated 100 times so we can observe a distribution of transit times.
+
+With every loop I did the following:
+1) Given a current positional index (i, j) locate all nearby sites
+2) Calculate the hopping rate to each of those sites, based on their energy and position with respect to the current site
+3) Multiply the rates in the positive x-direction by a factor greater than 1, and the rates in the negative direction by a factor less than 1, to mimic the effect of drift
+4) Randomly select one of the nearby sites to have its rate multiplied by a factor larger than 1 to mimic the effect of diffusion
+5) Select the next site to hop to, based on the weighting of their respective weights
+
+Once I know the next hopping site that the particle will go to and its corresponding rate, I can calculate the time this will take and repeat this until I reach the end of my grid (end of the x-axis).
+
+Based on a grid with energetic disorder of 2, and positional disorder of 1, with a square shape of 10x10 sites, I get the following distributions for transit time with varied electric field:
+
+![](2D_times_varied_E.png)
+
+Here the x-axis is labeled 'Transit time steps'.
+
+This gives us the following information:
+- Increasing the electric field (E) gives lower transit times - makes physical sense, larger force to pull the charges across the grid should make it traverse it faster
